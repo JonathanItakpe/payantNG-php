@@ -1,5 +1,5 @@
 {
-    "name": "JonathanItakpe/payantNG-php",
+    "name": "jonathanitakpe/payantng-php",
     "description": "A PHP Wrapper for the PayantNG Library",
     "authors": [
         {
@@ -7,6 +7,14 @@
             "email": "jonathan@floatr.com.ng"
         }
     ],
+	"autoload": {
+        "psr-4": {
+			"PayantNG\\Payant\\": "src/PayantNG/Payant/"
+			},
+        "files": [
+            "src/PayantNG/helpers.php"
+        ]
+    },
     "license": "MIT",
     "require": {
         "php": ">=5.5.9",
