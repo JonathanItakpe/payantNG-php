@@ -1,0 +1,15 @@
+{
+    "name": "JonathanItakpe/payantNG-php",
+    "description": "A PHP Wrapper for the PayantNG Library",
+    "authors": [
+        {
+            "name": "Jonathan Itakpe",
+            "email": "jonathan@floatr.com.ng"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.5.9",
+        "guzzlehttp/guzzle": "~6.0"
+    }
+}
