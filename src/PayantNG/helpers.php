@@ -20,6 +20,31 @@ if (! function_exists('array_get'))
    }
 }
 
+if(!function_exists('array_keys_exist')){
+    /**
+     * Checks if multiple keys exist in an array
+     *
+     * @param array $array
+     * @param array|string $keys
+     *
+     * @return bool
+     */
+    function array_keys_exist( array $array, $keys ) {
+        $count = 0;
+        if ( ! is_array( $keys ) ) {
+            $keys = func_get_args();
+            array_shift( $keys );
+        }
+        foreach ( $keys as $key ) {
+            if ( array_key_exists( $key, $array ) ) {
+                $count ++;
+            }
+        }
+
+        return count( $keys ) === $count;
+    }
+}
+
 function cleanResponse($response){
     $response_code = $response->getStatusCode();
     $result = $response->getBody();
@@ -29,6 +54,6 @@ function cleanResponse($response){
         throw new phpException("An error occured with code {$response_code} - message: {$message}");
     }
 
-    return $result;
+    return json_decode($result);
 }
  ?>
