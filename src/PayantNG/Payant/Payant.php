@@ -39,9 +39,9 @@ class Payant {
 			]
 		]);
 	}
-
 	/**
-	 * Get States in Nigeria
+	 * [getStates Get States in a country (Nigeria)]
+	 * @return [object] [list of states and their respective state_ids]
 	 */
 	public function getStates(){
 		$response = $this->client->get('/states');
@@ -49,7 +49,8 @@ class Payant {
 	}
 
 	/**
-	 * Get Local Govt Areas in a State
+	 * [getLGAs Get LGAs in a state]
+	 * @param  [string] $state_id [description]
 	 */
 	public function getLGAs($state_id=null){
 		if(!$state_id){
@@ -63,9 +64,9 @@ class Payant {
 		return cleanResponse($response);
 	}
 
-	/**
-     * Add a new Client
-     * @param array $client_data
+    /**
+     * [addClient description]
+     * @param array $client_data [description]
      * Required fields - 'first_name', 'last_name', 'email', 'phone'
      * Optional - 'address', 'company_name', 'lga', 'state'
      */
@@ -82,37 +83,34 @@ class Payant {
          return cleanResponse($response);
      }
 
-     /**
-      * Get details of an Existing Client
-      * @param Int $client_id
-      */
-      public function getClient($client_id = null){
-          if(!$client_id){
-              throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid Client Id");
-          }
+    /**
+     * [getClient Get client Details]
+     * @param  [string] $client_id
+     * @return [object]
+     */
+	public function getClient($client_id = null){
+		if(!$client_id){
+			throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid Client Id");
+		}
 
-          $client_id = (int) $client_id;
+		$url = "/clients/{$client_id}";
 
-          $url = "/clients/{$client_id}";
+		$response = $this->client->get($url);
 
-          $response = $this->client->get($url);
-
-          return cleanResponse($response);
-      }
+		return cleanResponse($response);
+	}
 
       /**
-       * Edit Existing Client
-       * @param int $client_id
-       * @param array $client_data
-       * Required fields - 'first_name', 'last_name', 'email', 'phone'
-       * Optional - 'address', 'company_name', 'lga', 'state'
+       * [editClient - Edit Existing Client]
+       * @param [string] $client_id
+       * @param [array] $client_data
+       *        Required fields - 'first_name', 'last_name', 'email', 'phone'
+       *        Optional - 'address', 'company_name', 'lga', 'state'
        */
        public function editClient( $client_id, array $client_data){
            if(!$client_id){
                throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid Client Id");
            }
-
-           $client_id = (int) $client_id;
 
            $url = "/clients/{$client_id}";
 
@@ -128,16 +126,14 @@ class Payant {
            return cleanResponse($response);
        }
 
-       /**
-        * Delete an Existing Client
-        * @param int $client_id
-        */
+        /**
+         * [deleteClient]
+         * @param  [string] $client_id [description]
+         */
         public function deleteClient($client_id = null){
             if(!$client_id){
                 throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid Client Id");
             }
-
-            $client_id = (int) $client_id;
 
             $url = "/clients/{$client_id}";
 
@@ -146,6 +142,16 @@ class Payant {
             return cleanResponse($response);
         }
 
+        /**
+         * [addInvoice description]
+         * @param [string]      $client_id   [Optional - if client_data is supplied]
+         * @param array|null 	$client_data [Optional - if client_id is supplied]
+         *      Required Keys - 'first_name', 'last_name', 'email', 'phone'
+         *      Optional - 'address', 'company_name', 'lga', 'state'                        
+         * @param [string]      $due_date    [Mandatory, Format - DD/MM/YYYY]
+         * @param [string]      $fee_bearer  [Mandatory]
+         * @param array         $items       [Mandatory]
+         */
 		public function addInvoice($client_id = null, array $client_data = null, $due_date, $fee_bearer, array $items){
 			// Mandatory Client fields
             $required_client_values = ['first_name', 'last_name', 'email', 'phone'];
@@ -187,7 +193,12 @@ class Payant {
 			return cleanResponse($response);
 		}
 
-		public function getInvoice($reference_code = null){
+		/**
+		 * [getInvoice ]
+		 * @param  [string] $reference_code [Mandatory - Invoice Reference Code]
+		 * @return [object]               
+		 */
+		public function getInvoice($reference_code){
 			if(!$reference_code){
 				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
 			}
@@ -199,6 +210,11 @@ class Payant {
 			return cleanResponse($response);
 		}
 
+		/**
+		 * [sendInvoice]
+		 * @param  [type] $reference_code [Mandatory - Invoice Reference Code]
+		 * @return [object]               
+		 */
 		public function sendInvoice($reference_code = null){
 			if(!$reference_code){
 				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
@@ -211,6 +227,13 @@ class Payant {
 			return cleanResponse($response);
 		}
 
+		/**
+		 * [getInvoiceHistory]
+		 * @param  [string] $period [Mandatory || Valid Options ["today", "week", "month", "30", "90", "year", "custom"]]
+		 * @param  [string] $start  [Format - DD/MM/YYYY]
+		 * @param  [string] $end    [Format - DD/MM/YYYY]
+		 * @return [object]         
+		 */
 		public function getInvoiceHistory($period, $start, $end){
 			if(!$period){
 				throw new Exception\RequiredValueMissing("Error Processing Request - period Missing");
@@ -242,12 +265,235 @@ class Payant {
 			return cleanResponse($response);
 		}
 
-		public function deleteInvoice($reference_code = null){
+		/**
+		 * [deleteInvoice]
+		 * @param  [string] $reference_code [Mandatory - Invoice Reference Code]
+		 * @return [object]                 
+		 */
+		public function deleteInvoice($reference_code){
 			if(!$reference_code){
 				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
 			}
 
 			$url = "/invoices/{$reference_code}";
+
+			$response = $this->client->delete($url);
+
+			return cleanResponse($response);
+		}
+
+		/**
+		 * [addPayment]
+		 * @param [string] $reference_code [Mandatory - Invoice Reference Code]
+		 * @param [string] $date           [Mandatory - [Format - DD/MM/YYYY]]
+		 * @param [string] $amount         [Mandatory]
+		 * @param [string] $channel        [Mandatory - valid ["Cash", "BankTransfer", "POS", "Cheque"]]
+		 */
+		public function addPayment(string $reference_code, string $date, string $amount, string $channel){
+			if(!$reference_code){
+				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+			}
+
+			if(!$due_date){
+				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid date");
+			}
+
+			if(!$amount){
+				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid amount");
+			}
+
+			$valid_channels = ["Cash", "BankTransfer", "POS", "Cheque"];
+
+			if(!$channel){
+				throw new Exception\IsNull("Error Processing Request - Null/Invalid amount");
+			}elseif (!array_key_exists($valid_channels, ucfirst($channel))) {
+				throw new Exception\IsInvalid("Invalid Channel - Cash, BankTransfer, POS or Cheque");
+			}
+
+			$url = "/payments";
+
+			$post_data = [
+				'reference_code' => $reference_code,
+				'date' => $date,
+				'amount' => $amount,
+				'channel' => $channel
+			];
+
+			$response = $this->client->post($url, ['form_params' => $post_data]);
+
+			return cleanResponse($response);
+		}
+
+		public function getPayment($reference_code){
+			if(!$reference_code){
+				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+			}
+
+			$url = "/payments/{$reference_code}";
+
+			$response = $this->client->get($url);
+
+			return cleanResponse($response);
+		}
+
+		/**
+		 * [getPaymentHistory]
+		 * @param  [string] $period [Mandatory || Valid Options ["today", "week", "month", "30", "90", "year", "custom"]]
+		 * @param  [string] $start  [Format - DD/MM/YYYY || Optional if $period !== 'custom']
+		 * @param  [string] $end    [Format - DD/MM/YYYY || Optional if $period !== 'custom']
+		 * @return [object]         
+		 */
+		public function getPaymentHistory(string $period, string $start, string $end){
+			if(!$period){
+				throw new Exception\RequiredValueMissing("Error Processing Request - period Missing");
+			}
+
+			//Validate Period
+			$valid_period_options = ["today", "week", "month", "30", "90", "year", "custom"];
+
+			if (!array_key_exists($valid_period_options, strtolower($period))) {
+				throw new Exception\IsInvalid("Invalid Period - Available options: today, week, month, 30, 90, year or custom");
+			}
+
+			$post_data = [
+				'period' => $period
+			];
+
+			if ($period == 'custom'){
+				if (!$start || !$end){
+					throw new Exception\IsNull("Invalid custom Start or End date");
+				}
+				$post_data['start'] = $start;
+				$post_data['end'] = $end;
+			}
+
+			$url = "/payments/history";
+
+			$response = $this->client->post($url, ['form_params' => $post_data]);
+
+			return cleanResponse($response);
+		}
+
+		/**
+		 * [addProduct]
+		 * @param string $name        [Mandatory - Product's name]
+		 * @param string $description [Mandatory - Product's description]
+		 * @param string $unit_cost   [Mandatory - Product's unit cost]
+		 * @param string $type        [Mandatory - Product type 'product' or 'service']
+		 */
+		public function addProduct(string $name, string $description, string $unit_cost, string $type){
+			if(!$name){
+				throw new Exception\IsNull("Error Processing Request - Null/Invalid name");
+			}
+
+			if(!$description){
+				throw new Exception\IsNull("Error Processing Request - Null/Invalid description");
+			}
+
+			if(!$unit_cost){
+				throw new Exception\IsNull("Error Processing Request - Null/Invalid unit_cost");
+			}
+
+			//Validate Product Type
+			$valid_product_type = ["product", "service"];
+
+			if(!$type){
+				throw new Exception\IsNull("Error Processing Request - Null/Invalid type");
+			}elseif (!array_key_exists($valid_product_type, strtolower($type))) {
+				throw new Exception\IsInvalid("Invalid Type - Available options: 'product' or 'service'");
+			}
+
+			$url = "/products";
+
+			$post_data = [
+				'name' => $name,
+				'description' => $description,
+				'unit_cost' => $unit_cost,
+				'type' => $type
+			];
+
+			$response = $this->client->post($url, ['form_params' => $post_data]);
+
+			return cleanResponse($response);
+		}
+
+		/**
+		 * [getProduct]
+		 * @param  [int] $product_id [Mandatory - Product ID]
+		 * @return [object] 
+		 */
+		public function getProduct($product_id){
+			if(!$product_id){
+				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid product_id");
+			}
+
+			$url = "/products/{$product_id}";
+
+			$response = $this->client->get($url);
+
+			return cleanResponse($response);
+		}
+
+		/**
+		 * [editProduct]
+		 * @param  string $product_id   [Mandatory - Product ID]
+		 * @param  array  $product_data [description]
+		 * @return object               
+		 */
+		public function editProduct($product_id, array $product_data){
+			if(!$product_id){
+               throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid Product Id");
+           }
+
+           	//Validate Type
+        	$product_type = strtolower(array_get($product_data, 'type', 'none'));
+
+           	$valid_product_type = ["product", "service"];
+
+			if(!$product_type){
+				throw new Exception\IsNull("Error Processing Request - Null/Invalid type");
+			}elseif (!array_key_exists($valid_product_type, $product_type)) {
+				throw new Exception\IsInvalid("Invalid Type - Available options: 'product' or 'service'");
+			}
+
+           $url = "/products/{$product_id}";
+
+           // Mandatory fields
+           $required_values = ['name', 'description', 'unit_cost', 'type'];
+
+            if(!array_keys_exist($client_data, $required_values)){
+                 throw new Exception\RequiredValuesMissing("Missing required values :(");
+            }
+
+
+        	$response = $this->client->put($url, ['form_params' => $product_data]);
+
+        	return cleanResponse($response);
+		}
+
+		/**
+		 * [getProducts]
+		 * @return object
+		 */
+		public function getProducts(){
+			$url = "/products";
+
+			$response = $this->client->get($url);
+
+        	return cleanResponse($response);
+		}
+
+		/**
+		 * [deleteProduct]
+		 * @param $product_id [Mandatory - Product ID]
+		 * @return object           
+		 */
+		public function deleteProduct($product_id){
+			if(!$product_id){
+            	throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid Product Id");
+           	}
+
+			$url = "/products/{$product_id}";
 
 			$response = $this->client->delete($url);
 
