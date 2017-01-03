@@ -3,6 +3,8 @@
 namespace PayantNG\Payant;
 
 use GuzzleHttp\Client;
+use PayantNG\Payant\Exception;
+use \Exception as phpException;
 
 class Payant {
 	/**
@@ -23,6 +25,7 @@ class Payant {
 		// Trim Key
 		$private_key = trim($private_key);
 		$this->private_key = $private_key;
+
 		// Generate Authorization String
 		$authorization_string = "Bearer {$this->private_key}";
 
@@ -38,7 +41,22 @@ class Payant {
 	}
 
 	public function getStates(){
-		$resp = $this->client->get('/states');
-		echo $resp;
+		$response = $this->client->get('/states');
+		return cleanResponse($response);
+	}
+
+	/**
+	 * Get Local Govt Areas in a State
+	 */
+	public function getLGAs($state_id=null){
+		if(!$state_id){
+			throw new phpException("Error Processing Request - Null/Invalid State Id");
+		}
+
+		$post_data = ['state_id' => $state_id];
+
+		$response = $this->client->post('/lgas', ['form_params' => $post_data]);
+
+		return cleanResponse($response);
 	}
 }

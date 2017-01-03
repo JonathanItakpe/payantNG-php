@@ -1,6 +1,6 @@
 {
     "name": "jonathanitakpe/payantng-php",
-    "description": "A PHP Wrapper for the PayantNG Library",
+    "description": "A PHP Wrapper for the PayantNG API",
     "authors": [
         {
             "name": "Jonathan Itakpe",
