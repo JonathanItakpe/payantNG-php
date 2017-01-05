@@ -1,16 +1,17 @@
 # payantNG-php
 PHP Library for PayantNG
 
-# How to Use
+### How to Use
 Require the package from Packagist - `composer require jonathanitakpe/payantng-php`
 
-# Function Naming Convention
-Functions are named based on the documentation located here - https://developers.payant.ng/overview
+### Function Naming Convention
+Functions are named based on the documentation located https://developers.payant.ng/overview
 
 `Add Client` from the documentation becomes `$Payant->addClient()` as in the sample code below:
 
-# Sample code
-```<?php
+### Sample code
+```php
+<?php
 require_once 'vendor/autoload.php';
 use PayantNG\Payant;
 
@@ -21,5 +22,6 @@ $client_deet = ['first_name' => 'Jonathan',
 				'phone' => '+2348146558887'];
 
 $Payant->addClient($client_deet);
- ?>```
+ ?>
+ ```
 
