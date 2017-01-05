@@ -79,7 +79,7 @@ class Payant {
 
          $url = '/clients';
  
-         return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+         return $this->sendRequest('post', $url, ['form_params' => $client_data]);
      }
 
     /**
@@ -145,14 +145,14 @@ class Payant {
          * @param [string]      $fee_bearer  [Mandatory]
          * @param array         $items       [Mandatory]
          */
-		public function addInvoice($client_id = null, array $client_data = null, $due_date, $fee_bearer, array $items){
+		public function addInvoice($client_id, array $client_data, $due_date, $fee_bearer, array $items){
 			// Mandatory Client fields
             $required_client_values = ['first_name', 'last_name', 'email', 'phone'];
 			// Vaild fee_bearer types: 'account' and 'client'
 			$valid_fee_bearers = ['account', 'client'];
 
 			// Either the client Id is supplied or a new client data is provided
-			if(!$client_id && !array_keys_exist($client_data, $required_values)){
+			if(!$client_id && !array_keys_exist($client_data, $required_client_values)){
 				throw new Exception\RequiredValuesMissing("Missing required values :( - Provide client_id or client_data");
 			}
 
@@ -162,7 +162,7 @@ class Payant {
 
 			if(!$fee_bearer){
 				throw new Exception\IsNull("Error Processing Request - Null Fee Bearer");
-			}elseif (!array_key_exists($valid_fee_bearers, $fee_bearer)) {
+			}elseif (!in_array($fee_bearer, $valid_fee_bearers)) {
 				throw new Exception\InvalidFeeBearer("Invalid Fee Bearer - Use either 'account' or 'client'");
 			}
 
@@ -221,7 +221,7 @@ class Payant {
 		 * @param  [string] $end    [Format - DD/MM/YYYY]
 		 * @return [object]         
 		 */
-		public function getInvoiceHistory($period, $start, $end){
+		public function getInvoiceHistory($period, $start = null, $end = null){
 			if(!$period){
 				throw new Exception\RequiredValueMissing("Error Processing Request - period Missing");
 			}
@@ -229,7 +229,7 @@ class Payant {
 			//Validate Period
 			$valid_period_options = ["today", "week", "month", "30", "90", "year", "custom"];
 
-			if (!array_key_exists($valid_period_options, $period)) {
+			if (!in_array($period, $valid_period_options)) {
 				throw new Exception\IsInvalid("Invalid Period - Available options: today, week, month, 30, 90, year or custom");
 			}
 
@@ -289,7 +289,7 @@ class Payant {
 
 			if(!$channel){
 				throw new Exception\IsNull("Error Processing Request - Null/Invalid amount");
-			}elseif (!array_key_exists($valid_channels, ucfirst($channel))) {
+			}elseif (!in_array(ucfirst($channel), $valid_channels)) {
 				throw new Exception\IsInvalid("Invalid Channel - Cash, BankTransfer, POS or Cheque");
 			}
 
@@ -330,7 +330,7 @@ class Payant {
 			//Validate Period
 			$valid_period_options = ["today", "week", "month", "30", "90", "year", "custom"];
 
-			if (!array_key_exists($valid_period_options, strtolower($period))) {
+			if (!in_array(strtolower($period), $valid_period_options)) {
 				throw new Exception\IsInvalid("Invalid Period - Available options: today, week, month, 30, 90, year or custom");
 			}
 
@@ -376,7 +376,7 @@ class Payant {
 
 			if(!$type){
 				throw new Exception\IsNull("Error Processing Request - Null/Invalid type");
-			}elseif (!array_key_exists($valid_product_type, strtolower($type))) {
+			}elseif (!in_array(strtolower($type), $valid_product_type)) {
 				throw new Exception\IsInvalid("Invalid Type - Available options: 'product' or 'service'");
 			}
 
@@ -425,7 +425,7 @@ class Payant {
 
 			if(!$product_type){
 				throw new Exception\IsNull("Error Processing Request - Null/Invalid type");
-			}elseif (!array_key_exists($valid_product_type, $product_type)) {
+			}elseif (!in_array($product_type, $valid_product_type)) {
 				throw new Exception\IsInvalid("Invalid Type - Available options: 'product' or 'service'");
 			}
 
