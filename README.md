@@ -15,11 +15,11 @@ Functions are named based on the documentation located https://developers.payant
 require_once 'vendor/autoload.php';
 use PayantNG\Payant;
 
-$Payant = new Payant\Payant('13337b79a82d1132bd1e22cfdaac92ba5d02772a1ae3a0481c59229c');
+$Payant = new Payant\Payant('13337b87ee76gew87fg87gfweugf87w7ge78f229c');
 $client_deet = ['first_name' => 'Jonathan',
 				'last_name' => 'Itakpe',
 				'email' => 'jonathan@floatr.com.ng',
-				'phone' => '+2348146558887'];
+				'phone' => '+234809012345'];
 
 $Payant->addClient($client_deet);
  ?>
