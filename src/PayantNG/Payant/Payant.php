@@ -14,7 +14,7 @@ class Payant {
 	/**
 	 * @var $api_url
 	 */
-	protected $api_url = 'https://api.demo.payant.ng';
+	protected $api_url = 'https://api.payant.ng';
 	/**
 	 * @var $client
 	 */
