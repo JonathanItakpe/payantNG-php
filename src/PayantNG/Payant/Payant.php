@@ -16,11 +16,15 @@ class Payant {
 	 */
 	protected $api_url = 'https://api.payant.ng';
 	/**
+	 * @var $demo_api_url
+	 */
+	protected $demo_api_url = 'https://api.demo.payant.ng';
+	/**
 	 * @var $client
 	 */
 	protected $client;
 
-	public function __construct($private_key)
+	public function __construct($private_key, $demo=false)
 	{
 		// Trim Key
 		$private_key = trim($private_key);
@@ -29,9 +33,17 @@ class Payant {
 		// Generate Authorization String
 		$authorization_string = "Bearer {$this->private_key}";
 
+		//Specify Api Url to use - Demo or Live
+		$base_uri = '';
+		if($demo === true){
+			$base_uri = $this->demo_api_url;
+		}else{
+			$base_uri = $this->api_url;
+		}
+
 		//Set up Guzzle
 		$this->client = new GuzzleHttp\Client( [
-			'base_uri' => $this->api_url,
+			'base_uri' => $base_uri,
 			'protocols' => ['https'],
 			'headers' => [
 				'Authorization' => $authorization_string,
