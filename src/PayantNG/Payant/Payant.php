@@ -2,7 +2,7 @@
 
 namespace PayantNG\Payant;
 
-use GuzzleHttp\Client;
+use GuzzleHttp;
 use PayantNG\Payant\Exception;
 use \Exception as phpException;
 
@@ -30,7 +30,7 @@ class Payant {
 		$authorization_string = "Bearer {$this->private_key}";
 
 		//Set up Guzzle
-		$this->client = new Client( [
+		$this->client = new GuzzleHttp\Client( [
 			'base_uri' => $this->api_url,
 			'protocols' => ['https'],
 			'headers' => [
@@ -44,8 +44,7 @@ class Payant {
 	 * @return [object] [list of states and their respective state_ids]
 	 */
 	public function getStates(){
-		$response = $this->client->get('/states');
-		return cleanResponse($response);
+		return $this->sendRequest('get', '/states');
 	}
 
 	/**
@@ -59,9 +58,9 @@ class Payant {
 
 		$post_data = ['state_id' => $state_id];
 
-		$response = $this->client->post('/lga', ['form_params' => $post_data]);
+		$url = '/lga';
 
-		return cleanResponse($response);
+		return $this->sendRequest('post', $url, ['form_params' => $post_data]);
 	}
 
     /**
@@ -78,9 +77,9 @@ class Payant {
              throw new Exception\RequiredValuesMissing("Missing required values :(");
          }
 
-         $response = $this->client->post('/clients', ['form_params' => $client_data]);
-
-         return cleanResponse($response);
+         $url = '/clients';
+ 
+         return $this->sendRequest('post', $url, ['form_params' => $post_data]);
      }
 
     /**
@@ -95,9 +94,7 @@ class Payant {
 
 		$url = "/clients/{$client_id}";
 
-		$response = $this->client->get($url);
-
-		return cleanResponse($response);
+		return $this->sendRequest('get', $url);
 	}
 
       /**
@@ -121,9 +118,7 @@ class Payant {
                  throw new Exception\RequiredValuesMissing("Missing required values :(");
             }
 
-           $response = $this->client->put($url, ['form_params' => $client_data]);
-
-           return cleanResponse($response);
+           return $this->sendRequest('put', $url, ['form_params' => $client_data]);
        }
 
         /**
@@ -137,9 +132,7 @@ class Payant {
 
             $url = "/clients/{$client_id}";
 
-            $response = $this->client->delete($url);
-
-            return cleanResponse($response);
+            return $this->sendRequest('delete', $url);
         }
 
         /**
@@ -188,9 +181,7 @@ class Payant {
 			($client_id) ? $post_data['client_id'] = $client_id : null;
 			($client_data) ? $post_data['client'] = $client_data : null;
 
-			$response = $this->client->post($url, ['form_params' => $post_data]);
-
-			return cleanResponse($response);
+			return $this->sendRequest('post', $url, ['form_params' => $post_data]);
 		}
 
 		/**
@@ -205,9 +196,7 @@ class Payant {
 
 			$url = "/invoices/{$reference_code}";
 
-			$response = $this->client->get($url);
-
-			return cleanResponse($response);
+			return $this->sendRequest('get', $url);
 		}
 
 		/**
@@ -222,9 +211,7 @@ class Payant {
 
 			$url = "/invoices/send/{$reference_code}";
 
-			$response = $this->client->get($url);
-
-			return cleanResponse($response);
+			return $this->sendRequest('get', $url);
 		}
 
 		/**
@@ -260,9 +247,7 @@ class Payant {
 
 			$url = "/invoices/history";
 
-			$response = $this->client->post($url, ['form_params' => $post_data]);
-
-			return cleanResponse($response);
+			return $this->sendRequest('post', $url, ['form_params' => $post_data]);
 		}
 
 		/**
@@ -277,9 +262,7 @@ class Payant {
 
 			$url = "/invoices/{$reference_code}";
 
-			$response = $this->client->delete($url);
-
-			return cleanResponse($response);
+			return $this->sendRequest('delete', $url);
 		}
 
 		/**
@@ -319,9 +302,7 @@ class Payant {
 				'channel' => $channel
 			];
 
-			$response = $this->client->post($url, ['form_params' => $post_data]);
-
-			return cleanResponse($response);
+			return $this->sendRequest('post', $url, ['form_params' => $post_data]);
 		}
 
 		public function getPayment($reference_code){
@@ -331,9 +312,7 @@ class Payant {
 
 			$url = "/payments/{$reference_code}";
 
-			$response = $this->client->get($url);
-
-			return cleanResponse($response);
+			return $this->sendRequest('get', $url);
 		}
 
 		/**
@@ -369,9 +348,7 @@ class Payant {
 
 			$url = "/payments/history";
 
-			$response = $this->client->post($url, ['form_params' => $post_data]);
-
-			return cleanResponse($response);
+			return $this->sendRequest('post', $url, ['form_params' => $post_data]);
 		}
 
 		/**
@@ -412,9 +389,7 @@ class Payant {
 				'type' => $type
 			];
 
-			$response = $this->client->post($url, ['form_params' => $post_data]);
-
-			return cleanResponse($response);
+			return $this->sendRequest('post', $url, ['form_params' => $post_data]);
 		}
 
 		/**
@@ -429,9 +404,7 @@ class Payant {
 
 			$url = "/products/{$product_id}";
 
-			$response = $this->client->get($url);
-
-			return cleanResponse($response);
+			return $this->sendRequest('get', $url);
 		}
 
 		/**
@@ -465,10 +438,7 @@ class Payant {
                  throw new Exception\RequiredValuesMissing("Missing required values :(");
             }
 
-
-        	$response = $this->client->put($url, ['form_params' => $product_data]);
-
-        	return cleanResponse($response);
+        	return $this->sendRequest('put', $url, ['form_params' => $post_data]);
 		}
 
 		/**
@@ -478,9 +448,7 @@ class Payant {
 		public function getProducts(){
 			$url = "/products";
 
-			$response = $this->client->get($url);
-
-        	return cleanResponse($response);
+			return $this->sendRequest('get', $url);
 		}
 
 		/**
@@ -495,8 +463,38 @@ class Payant {
 
 			$url = "/products/{$product_id}";
 
-			$response = $this->client->delete($url);
+			return $this->sendRequest('delete', $url);
+		}
 
-			return cleanResponse($response);
+		public function sendRequest($method,$url,$params=[])
+		{
+			try{
+				if (strtolower($method) == 'get'){
+					$result = $this->client->request('GET', $url);
+				}elseif (strtolower($method) == 'post'){
+					$result = $this->client->request('POST', $url, $params);
+				}elseif (strtolower($method) == 'put'){
+					$result = $this->client->request('PUT', $url, $params);
+				}elseif (strtolower($method) == 'delete'){
+					$result = $this->client->request('DELETE', $url);
+				}
+
+				return cleanResponse($result);
+			}
+			// catch (GuzzleHttp\Exception\ClientException $e) {
+			// 	$response =$e->getResponse();
+	  //           return cleanResponse($response);
+	  //       }
+	  //       catch (GuzzleHttp\Exception\ServerException $e) {
+	  //       	$response =$e->getResponse();
+	  //           return $response;
+	  //       }
+	  //       catch (GuzzleHttp\Exception\BadResponseException $e) {
+	  //           $response =$e->getResponse();
+	  //           return $response;
+	        // }
+	        catch( Exception $e){
+	            throw $e;
+	        }
 		}
 }

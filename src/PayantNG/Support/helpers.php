@@ -1,6 +1,7 @@
 <?php
 namespace PayantNG\Payant;
 use \Exception as phpException;
+use PayantNG\Payant\Exception;
 
 if (! function_exists('array_get'))
 {
@@ -46,14 +47,7 @@ if(!function_exists('array_keys_exist')){
 }
 
 function cleanResponse($response){
-    $response_code = $response->getStatusCode();
-    $result = $response->getBody();
-
-    if ($response_code > 201){
-        $message = array_get($result, 'message', 'none');
-        throw new phpException("An error occured with code {$response_code} - message: {$message}");
-    }
-
-    return json_decode($result);
+	$result = $response->getBody();
+	return json_decode($result);
 }
  ?>

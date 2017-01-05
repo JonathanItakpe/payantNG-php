@@ -4,7 +4,8 @@
     "authors": [
         {
             "name": "Jonathan Itakpe",
-            "email": "jonathan@floatr.com.ng"
+            "email": "jonathan@floatr.com.ng",
+            "company": "floatr inc."
         }
     ],
 	"autoload": {
@@ -12,7 +13,7 @@
 			"PayantNG\\Payant\\": "src/PayantNG/Payant/"
 			},
         "files": [
-            "src/PayantNG/helpers.php"
+            "src/PayantNG/Support/helpers.php"
         ]
     },
     "license": "MIT",
