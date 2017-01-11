@@ -53,33 +53,17 @@ class Payant {
 	}
 	/**
 	 * [getStates Get States in a country (Nigeria)]
-	 * @return [object] [list of states and their respective state_ids]
+	 * @return [object] [list of banks and their respective bank_ids]
 	 */
-	public function getStates(){
-		return $this->sendRequest('get', '/states');
-	}
-
-	/**
-	 * [getLGAs Get LGAs in a state]
-	 * @param  [string] $state_id [description]
-	 */
-	public function getLGAs($state_id=null){
-		if(!$state_id){
-			throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid State Id");
-		}
-
-		$post_data = ['state_id' => $state_id];
-
-		$url = '/lga';
-
-		return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+	public function getBanks(){
+		return $this->sendRequest('get', '/banks');
 	}
 
     /**
      * [addClient description]
      * @param array $client_data [description]
      * Required fields - 'first_name', 'last_name', 'email', 'phone'
-     * Optional - 'address', 'company_name', 'lga', 'state'
+     * Optional - 'address', 'company_name', 'type', 'settlement_bank', 'account_number'
      */
      public function addClient( array $client_data){
          // Mandatory fields
@@ -114,7 +98,7 @@ class Payant {
        * @param [string] $client_id
        * @param [array] $client_data
        *        Required fields - 'first_name', 'last_name', 'email', 'phone'
-       *        Optional - 'address', 'company_name', 'lga', 'state'
+       *        Optional - 'address', 'company_name', 'type', 'settlement_bank', 'account_number'
        */
        public function editClient( $client_id, array $client_data){
            if(!$client_id){
