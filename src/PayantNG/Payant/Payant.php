@@ -79,8 +79,28 @@ class Payant {
 	public function getBanks(){
 		return $this->sendRequest('get', '/banks');
 	}
+    
 
     
+    /**
+     * [resolveAccount description]
+     * @param array $client_data [description]
+     * Required fields - 'settlement_bank', 'account_number'
+    */
+    public function resolveAccount( array $client_data){
+		// Mandatory fields
+		$required_values = ['settlement_bank', 'account_number'];
+
+		if(!array_keys_exist($client_data, $required_values)){
+		 throw new Exception\RequiredValuesMissing("Missing required values :(");
+		}
+
+		$url = '/resolve-account';
+
+		return $this->sendRequest('post', $url, ['form_params' => $client_data]);
+    }
+
+
 
     
     /**
