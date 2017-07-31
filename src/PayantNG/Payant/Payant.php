@@ -319,6 +319,118 @@ class Payant {
 
 
 	/**
+     * [addTransfer description]
+     * @param array $client_data [description]
+     * Required fields - 'first_name', 'last_name', 'email', 'phone', 'settlement_bank', 'account_number',
+     * Optional - 'address', 'company_name', 'type',
+     * @param [string]      $amount    [Mandatory]
+     */
+    public function addTransfer(array $client_data, string $amount){
+        // Mandatory Client fields
+        $required_client_values = ['first_name', 'last_name', 'email', 'phone', 'settlement_bank', 'account_number'];        
+        
+        if(!array_keys_exist($client_data, $required_client_values)){
+            throw new Exception\RequiredValuesMissing("Missing required values :( - Provide client_data");
+        }
+
+        if(!$amount){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid amount");
+        }
+
+        $url = "/transfers";
+
+        $post_data[
+            'client' => $client_data,
+            'amount' => $amount,
+            ];
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [getTransfer ]
+    * @param  [string] $reference_code [Mandatory - Transfer Reference Code]
+    * @return [object]               
+    */
+    public function getTransfer($reference_code){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        $url = "/transfers/{$reference_code}";
+
+        return $this->sendRequest('get', $url);
+    }
+
+
+
+
+
+
+    /**
+    * [getTransferHistory]
+    * @param  [string] $period [Mandatory || Valid Options ["today", "week", "month", "30", "90", "year", "custom"]]
+    * @param  [string] $start  [Format - DD/MM/YYYY]
+    * @param  [string] $end    [Format - DD/MM/YYYY]
+    * @return [object]         
+    */
+    public function getTransferHistory($period, $start = null, $end = null){
+        if(!$period){
+            throw new Exception\RequiredValueMissing("Error Processing Request - period Missing");
+        }
+
+        //Validate Period
+        $valid_period_options = ["today", "week", "month", "30", "90", "year", "custom"];
+
+        if (!in_array($period, $valid_period_options)) {
+            throw new Exception\IsInvalid("Invalid Period - Available options: today, week, month, 30, 90, year or custom");
+        }
+
+        $post_data = [
+            'period' => $period
+        ];
+
+        if ($period == 'custom'){
+            if (!$start || !$end){
+                throw new Exception\IsNull("Invalid custom Start or End date");
+            }
+            $post_data['start'] = $start;
+            $post_data['end'] = $end;
+        }
+
+        $url = "/transfers/history";
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [deleteTransfer]
+    * @param  [string] $reference_code [Mandatory - Invoice Reference Code]
+    * @return [object]                 
+    */
+    public function deleteTransfer($reference_code){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        $url = "/transfers/{$reference_code}";
+
+        return $this->sendRequest('delete', $url);
+    }
+
+
+
+
+
+	/**
 	* [addPayment]
 	* @param [string] $reference_code [Mandatory - Invoice Reference Code]
 	* @param [string] $date           [Mandatory - [Format - DD/MM/YYYY]]
