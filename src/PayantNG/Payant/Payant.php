@@ -433,11 +433,11 @@ class Payant {
 	/**
 	* [addPayment]
 	* @param [string] $reference_code [Mandatory - Invoice Reference Code]
-	* @param [string] $date           [Mandatory - [Format - DD/MM/YYYY]]
+	* @param [string] $due_date           [Mandatory - [Format - DD/MM/YYYY]]
 	* @param [string] $amount         [Mandatory]
 	* @param [string] $channel        [Mandatory - valid ["Cash", "BankTransfer", "POS", "Cheque"]]
 	*/
-	public function addPayment(string $reference_code, string $date, string $amount, string $channel){
+	public function addPayment(string $reference_code, string $due_date, string $amount, string $channel){
 		if(!$reference_code){
 			throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
 		}
@@ -462,7 +462,7 @@ class Payant {
 
 		$post_data = [
 			'reference_code' => $reference_code,
-			'date' => $date,
+			'date' => $due_date,
 			'amount' => $amount,
 			'channel' => $channel
 		];
@@ -623,11 +623,11 @@ class Payant {
        // Mandatory fields
        $required_values = ['name', 'description', 'unit_cost', 'type'];
 
-        if(!array_keys_exist($client_data, $required_values)){
+        if(!array_keys_exist($product_data, $required_values)){
              throw new Exception\RequiredValuesMissing("Missing required values :(");
         }
 
-    	return $this->sendRequest('put', $url, ['form_params' => $post_data]);
+    	return $this->sendRequest('put', $url, ['form_params' => $product_data]);
 	}
 
 	
