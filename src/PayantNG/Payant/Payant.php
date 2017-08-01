@@ -339,7 +339,7 @@ class Payant {
 
         $url = "/transfers";
 
-        $post_data[
+        $post_data = [
             'client' => $client_data,
             'amount' => $amount,
             ];
