@@ -528,6 +528,205 @@ class Payant {
 		return $this->sendRequest('post', $url, ['form_params' => $post_data]);
 	}
 
+
+
+
+
+	/**
+    * [addWallet]
+    * @param string $name        [Mandatory - Wallet's name]
+    * @param string $passcode [Mandatory - Wallet's passcode]
+    * @return object
+    */
+    public function addWallet(string $name, string $passcode){
+        if(!$name){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid name");
+        }
+
+        if(!$passcode || strlen($passcode) < 6){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid passcode/ length");
+        }
+
+        $url = "/wallets";
+
+        $post_data = [
+            'name' => $name,
+            'passcode' => $passcode,
+        ];
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [getWallet]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @return object 
+    */
+    public function getWallet(string $reference_code){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        $url = "/wallets/{$reference_code}";
+
+        return $this->sendRequest('get', $url);
+    }
+
+
+
+
+
+    /**
+    * [changeWalletPasscode]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @param  string $old_passcode [Mandatory - Wallet's Old Passcode]
+    * @param  string $passcode [Mandatory - Wallet's Passcode]    
+    * @return object 
+    */
+    public function changeWalletPasscode(string $reference_code, string $old_passcode, string $passcode){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        if(!$old_passcode){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid old_passcode");
+        }
+
+        if(!$passcode || strlen($passcode) < 6){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid passcode");
+        }
+
+        $post_data = [
+            'old_passcode' => $old_passcode,
+            'passcode' => $passcode,
+        ];
+
+        $url = "/wallets/{$reference_code}";
+
+        return $this->sendRequest('put', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [getWallets]
+    * @return object
+    */
+    public function getWallets(){
+
+        $url = "/wallets";
+
+        return $this->sendRequest('get', $url);
+    }
+
+
+
+
+
+    /**
+    * [setWalletStatus]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @return object 
+    */
+    public function setWalletStatus(string $reference_code){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        $url = "/wallets/status/{$reference_code}";
+
+        return $this->sendRequest('get', $url);
+    }
+
+
+
+
+
+    /**
+    * [withdrawFromWallet]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @param  array $client_data [Mandatory - Client Data]
+    * Required fields - 'settlement_bank', 'account_number'
+    * @param  string $amount [Mandatory - Amount to send]
+    * @param  string $passcode [Mandatory - Wallet's Passcode]
+    * @return object 
+    */
+    public function withdrawFromWallet(string $reference_code, array $client_data, string $amount, string $passcode){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        // Mandatory fields
+        $required_values = ['settlement_bank', 'account_number'];
+
+        if(!array_keys_exist($client_data, $required_values)){
+         throw new Exception\RequiredValuesMissing("Missing required values :(");
+        }
+
+        if(!$amount){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid amount");
+        }
+
+        if(!$passcode){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid passcode");
+        }
+
+        $post_data = [
+            'settlement_bank' => $client_data['settlement_bank'],
+            'account_number' => $client_data['account_number'],
+            'amount' => $amount,
+            'passcode' => $passcode,
+        ];
+
+        $url = "/wallets/withdraw/{$reference_code}";
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [getWalletTransactions]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @param  string $period [Mandatory || Valid Options ["today", "week", "month", "30", "90", "year", "custom"]]
+    * @param  string $start  [Format - DD/MM/YYYY]
+    * @param  string $end    [Format - DD/MM/YYYY]
+    * @return object         
+    */
+    public function getWalletTransactions(string $reference_code, $period, $start = null, $end = null){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        if(!$period){
+            throw new Exception\RequiredValueMissing("Error Processing Request - period Missing");
+        }
+
+        $post_data = [
+			'period' => $period
+		];
+
+		if ($period == 'custom'){
+			if (!$start || !$end){
+				throw new Exception\IsNull("Invalid custom Start or End date");
+			}
+			$post_data['start'] = $start;
+			$post_data['end'] = $end;
+		}
+
+        $url = "/wallets/transactions/{$reference_code}";
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
 	
 
 
