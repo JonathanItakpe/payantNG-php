@@ -339,13 +339,125 @@ class Payant {
 
 
 	/**
+     * [addTransfer description]
+     * @param array $client_data [description]
+     * Required fields - 'first_name', 'last_name', 'email', 'phone', 'settlement_bank', 'account_number',
+     * Optional - 'address', 'company_name', 'type',
+     * @param [string]      $amount    [Mandatory]
+     */
+    public function addTransfer(array $client_data, string $amount){
+        // Mandatory Client fields
+        $required_client_values = ['first_name', 'last_name', 'email', 'phone', 'settlement_bank', 'account_number'];        
+        
+        if(!array_keys_exist($client_data, $required_client_values)){
+            throw new Exception\RequiredValuesMissing("Missing required values :( - Provide client_data");
+        }
+
+        if(!$amount){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid amount");
+        }
+
+        $url = "/transfers";
+
+        $post_data = [
+            'client' => $client_data,
+            'amount' => $amount,
+            ];
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [getTransfer ]
+    * @param  [string] $reference_code [Mandatory - Transfer Reference Code]
+    * @return [object]               
+    */
+    public function getTransfer($reference_code){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        $url = "/transfers/{$reference_code}";
+
+        return $this->sendRequest('get', $url);
+    }
+
+
+
+
+
+
+    /**
+    * [getTransferHistory]
+    * @param  [string] $period [Mandatory || Valid Options ["today", "week", "month", "30", "90", "year", "custom"]]
+    * @param  [string] $start  [Format - DD/MM/YYYY]
+    * @param  [string] $end    [Format - DD/MM/YYYY]
+    * @return [object]         
+    */
+    public function getTransferHistory($period, $start = null, $end = null){
+        if(!$period){
+            throw new Exception\RequiredValueMissing("Error Processing Request - period Missing");
+        }
+
+        //Validate Period
+        $valid_period_options = ["today", "week", "month", "30", "90", "year", "custom"];
+
+        if (!in_array($period, $valid_period_options)) {
+            throw new Exception\IsInvalid("Invalid Period - Available options: today, week, month, 30, 90, year or custom");
+        }
+
+        $post_data = [
+            'period' => $period
+        ];
+
+        if ($period == 'custom'){
+            if (!$start || !$end){
+                throw new Exception\IsNull("Invalid custom Start or End date");
+            }
+            $post_data['start'] = $start;
+            $post_data['end'] = $end;
+        }
+
+        $url = "/transfers/history";
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [deleteTransfer]
+    * @param  [string] $reference_code [Mandatory - Invoice Reference Code]
+    * @return [object]                 
+    */
+    public function deleteTransfer($reference_code){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        $url = "/transfers/{$reference_code}";
+
+        return $this->sendRequest('delete', $url);
+    }
+
+
+
+
+
+	/**
 	* [addPayment]
 	* @param [string] $reference_code [Mandatory - Invoice Reference Code]
-	* @param [string] $date           [Mandatory - [Format - DD/MM/YYYY]]
+	* @param [string] $due_date           [Mandatory - [Format - DD/MM/YYYY]]
 	* @param [string] $amount         [Mandatory]
 	* @param [string] $channel        [Mandatory - valid ["Cash", "BankTransfer", "POS", "Cheque"]]
 	*/
-	public function addPayment(string $reference_code, string $date, string $amount, string $channel){
+	public function addPayment(string $reference_code, string $due_date, string $amount, string $channel){
 		if(!$reference_code){
 			throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
 		}
@@ -370,7 +482,7 @@ class Payant {
 
 		$post_data = [
 			'reference_code' => $reference_code,
-			'date' => $date,
+			'date' => $due_date,
 			'amount' => $amount,
 			'channel' => $channel
 		];
@@ -435,6 +547,205 @@ class Payant {
 
 		return $this->sendRequest('post', $url, ['form_params' => $post_data]);
 	}
+
+
+
+
+
+	/**
+    * [addWallet]
+    * @param string $name        [Mandatory - Wallet's name]
+    * @param string $passcode [Mandatory - Wallet's passcode]
+    * @return object
+    */
+    public function addWallet(string $name, string $passcode){
+        if(!$name){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid name");
+        }
+
+        if(!$passcode || strlen($passcode) < 6){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid passcode/ length");
+        }
+
+        $url = "/wallets";
+
+        $post_data = [
+            'name' => $name,
+            'passcode' => $passcode,
+        ];
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [getWallet]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @return object 
+    */
+    public function getWallet(string $reference_code){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        $url = "/wallets/{$reference_code}";
+
+        return $this->sendRequest('get', $url);
+    }
+
+
+
+
+
+    /**
+    * [changeWalletPasscode]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @param  string $old_passcode [Mandatory - Wallet's Old Passcode]
+    * @param  string $passcode [Mandatory - Wallet's Passcode]    
+    * @return object 
+    */
+    public function changeWalletPasscode(string $reference_code, string $old_passcode, string $passcode){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        if(!$old_passcode){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid old_passcode");
+        }
+
+        if(!$passcode || strlen($passcode) < 6){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid passcode");
+        }
+
+        $post_data = [
+            'old_passcode' => $old_passcode,
+            'passcode' => $passcode,
+        ];
+
+        $url = "/wallets/{$reference_code}";
+
+        return $this->sendRequest('put', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [getWallets]
+    * @return object
+    */
+    public function getWallets(){
+
+        $url = "/wallets";
+
+        return $this->sendRequest('get', $url);
+    }
+
+
+
+
+
+    /**
+    * [setWalletStatus]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @return object 
+    */
+    public function setWalletStatus(string $reference_code){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        $url = "/wallets/status/{$reference_code}";
+
+        return $this->sendRequest('get', $url);
+    }
+
+
+
+
+
+    /**
+    * [withdrawFromWallet]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @param  array $client_data [Mandatory - Client Data]
+    * Required fields - 'settlement_bank', 'account_number'
+    * @param  string $amount [Mandatory - Amount to send]
+    * @param  string $passcode [Mandatory - Wallet's Passcode]
+    * @return object 
+    */
+    public function withdrawFromWallet(string $reference_code, array $client_data, string $amount, string $passcode){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        // Mandatory fields
+        $required_values = ['settlement_bank', 'account_number'];
+
+        if(!array_keys_exist($client_data, $required_values)){
+         throw new Exception\RequiredValuesMissing("Missing required values :(");
+        }
+
+        if(!$amount){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid amount");
+        }
+
+        if(!$passcode){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid passcode");
+        }
+
+        $post_data = [
+            'settlement_bank' => $client_data['settlement_bank'],
+            'account_number' => $client_data['account_number'],
+            'amount' => $amount,
+            'passcode' => $passcode,
+        ];
+
+        $url = "/wallets/withdraw/{$reference_code}";
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
+
+
+
+
+
+    /**
+    * [getWalletTransactions]
+    * @param  string $reference_code [Mandatory - Wallet's Reference Code]
+    * @param  string $period [Mandatory || Valid Options ["today", "week", "month", "30", "90", "year", "custom"]]
+    * @param  string $start  [Format - DD/MM/YYYY]
+    * @param  string $end    [Format - DD/MM/YYYY]
+    * @return object         
+    */
+    public function getWalletTransactions(string $reference_code, $period, $start = null, $end = null){
+        if(!$reference_code){
+            throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
+        }
+
+        if(!$period){
+            throw new Exception\RequiredValueMissing("Error Processing Request - period Missing");
+        }
+
+        $post_data = [
+			'period' => $period
+		];
+
+		if ($period == 'custom'){
+			if (!$start || !$end){
+				throw new Exception\IsNull("Invalid custom Start or End date");
+			}
+			$post_data['start'] = $start;
+			$post_data['end'] = $end;
+		}
+
+        $url = "/wallets/transactions/{$reference_code}";
+
+        return $this->sendRequest('post', $url, ['form_params' => $post_data]);
+    }
 
 	
 
@@ -531,11 +842,11 @@ class Payant {
        // Mandatory fields
        $required_values = ['name', 'description', 'unit_cost', 'type'];
 
-        if(!array_keys_exist($client_data, $required_values)){
+        if(!array_keys_exist($product_data, $required_values)){
              throw new Exception\RequiredValuesMissing("Missing required values :(");
         }
 
-    	return $this->sendRequest('put', $url, ['form_params' => $post_data]);
+    	return $this->sendRequest('put', $url, ['form_params' => $product_data]);
 	}
 
 	
