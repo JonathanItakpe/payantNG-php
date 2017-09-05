@@ -7,6 +7,10 @@ use PayantNG\Payant;
 class PayantTest extends \PHPUnit_Framework_TestCase {
     private $payant;
 
+    private $existing_client_email;
+
+    private $created_client_id;
+
     protected function setUp()
     {
         $this->payant = new Payant\Payant('13337b79a82d1132bd1e22cfdaac92ba5d02772a1ae3a0481c59229c', true);
@@ -27,6 +31,11 @@ class PayantTest extends \PHPUnit_Framework_TestCase {
 
         $response = $this->payant->addClient($client_deet);
 
+        // Set the ID for the new client
+        if($response->status == 'success'){
+            $this->created_client_id = $response->data['id'];
+        }
+
         $this->assertEquals($response->status, 'success');
     }
 
@@ -44,6 +53,8 @@ class PayantTest extends \PHPUnit_Framework_TestCase {
 
     public function testDeleteClient()
     {
-        # code...
+        $response = $this->payant->deleteClient($this->created_client_id);
+
+        $this->assertEquals($response->status, 'success');
     }
 }
