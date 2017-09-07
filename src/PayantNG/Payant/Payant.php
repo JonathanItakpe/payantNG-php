@@ -273,7 +273,7 @@ class Payant {
 				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid reference_code");
 			}
 
-			if(!$due_date){
+			if(!$date){
 				throw new Exception\IsNullOrInvalid("Error Processing Request - Null/Invalid date");
 			}
 
@@ -318,7 +318,7 @@ class Payant {
 		 * @param  [string] $end    [Format - DD/MM/YYYY || Optional if $period !== 'custom']
 		 * @return [object]         
 		 */
-		public function getPaymentHistory(string $period, string $start, string $end){
+		public function getPaymentHistory(string $period, string $start = null, string $end = null){
 			if(!$period){
 				throw new Exception\RequiredValueMissing("Error Processing Request - period Missing");
 			}
